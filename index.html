@@ -46,9 +46,15 @@ h2 { font: 500 34px/1.1 var(--text); margin: 0 0 12px; }
 .reg-head p { max-width: 38ch; margin: 0; }
 form label { display: block; font: 600 13px/1 var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 7px; }
 form label span { color: var(--violet); }
-form input, form select { width: 100%; font: 400 17px/1.3 var(--ui); padding: 11px 12px; margin: 0 0 18px; border: 1px solid var(--muted); border-radius: 0; background: var(--sheet); color: var(--ink); }
-form input:focus, form select:focus { outline: 3px solid var(--gilt); outline-offset: 1px; border-color: var(--violet); }
+form input[type=text], form input[type=email], form select, form textarea { width: 100%; font: 400 17px/1.3 var(--ui); padding: 11px 12px; margin: 0 0 18px; border: 1px solid var(--muted); border-radius: 0; background: var(--sheet); color: var(--ink); }
+form input:focus, form select:focus, form textarea:focus { outline: 3px solid var(--gilt); outline-offset: 1px; border-color: var(--violet); }
 form input.bad { border-color: #a3261f; border-width: 2px; }
+form textarea { resize: vertical; margin-bottom: 6px; }
+fieldset { border: 0; padding: 0; margin: 0 0 18px; }
+legend { font: 600 13px/1 var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0; margin: 0 0 9px; }
+form label.radio { font: 400 16px/1.3 var(--ui); letter-spacing: 0; text-transform: none; color: var(--ink); margin: 0 0 7px; cursor: pointer; }
+form label.radio input { accent-color: var(--violet); margin: 0 8px 0 0; }
+.note.help { margin: 0 0 20px; }
 form button.go { border: 0; border-bottom: 3px solid var(--gilt); cursor: pointer; }
 .note { font: 400 14px/1.45 var(--ui); color: var(--muted); margin: 12px 0 0; }
 #reg-msg:empty { display: none; }
@@ -92,7 +98,7 @@ footer a { color: var(--gilt); }
         <li><b>Labs</b><span>Judge agreement, confidence interval against a threshold, vendor report triage, sign-off memo</span></li>
         <li><b>Coding</b><span>None</span></li>
       </ul>
-      <a class="go" href="#register" data-course="Evaluating AI models">Register to Enrol</a>
+      <a class="go" href="#register" data-course="Evaluating AI Models 2027">Register to Enroll</a>
     </article>
 
     <article class="course">
@@ -104,32 +110,36 @@ footer a { color: var(--gilt); }
         <li><b>Units</b><span>Evaluation, audit and verification; assurance levels; access; independence; evidence and sampling; audit report; regimes compared; commissioning an auditor</span></li>
         <li><b>Coding</b><span>None</span></li>
       </ul>
-      <a class="go" href="#register" data-course="Auditing AI models">Register to Enrol</a>
+      <a class="go" href="#register" data-course="Auditing AI Models 2027">Register to Enroll</a>
     </article>
   </section>
 
   <section class="register" id="register" aria-labelledby="reg-h">
     <div class="reg-head">
-      <p class="kicker">Enrolment</p>
-      <h2 id="reg-h">Register to Enrol</h2>
-      <p>Send your details and the course you want. A reply with enrolment information follows by email.</p>
+      <p class="kicker">Enrollment</p>
+      <h2 id="reg-h">Register to Enroll</h2>
+      <p>Select a course and enter your name and contact details to receive the course prospectus and an invitation to enroll.</p>
     </div>
     <form id="reg-form" novalidate>
       <label for="f-course">Course</label>
-      <select id="f-course" name="course">
-        <option>Evaluating AI models</option>
-        <option>Auditing AI models</option>
-        <option>Both courses</option>
-      </select>
+      <select id="f-course" name="course"></select>
+      <fieldset>
+        <legend>Enrolling as</legend>
+        <label class="radio"><input type="radio" name="as" value="As Individual"> An individual</label>
+        <label class="radio"><input type="radio" name="as" value="For a group or an organization"> A group or an organization</label>
+      </fieldset>
       <label for="f-name">Name <span aria-hidden="true">*</span></label>
       <input id="f-name" name="name" type="text" autocomplete="name" required>
-      <label for="f-email">Email <span aria-hidden="true">*</span></label>
+      <label for="f-email">Email address <span aria-hidden="true">*</span></label>
       <input id="f-email" name="email" type="email" autocomplete="email" required>
-      <label for="f-org">Organisation <span aria-hidden="true">*</span></label>
-      <input id="f-org" name="organisation" type="text" autocomplete="organization" required>
-      <button class="go" type="submit">Register to Enrol</button>
+      <label for="f-org">Organisation</label>
+      <input id="f-org" name="organisation" type="text" autocomplete="organization">
+      <label for="f-rem">Training needs</label>
+      <textarea id="f-rem" name="remarks" rows="3" aria-describedby="rem-help"></textarea>
+      <p class="note help" id="rem-help">Describe your organisation's training needs if you wish. Courses and materials are also provided on demand.</p>
+      <button class="go" type="submit">Register to Enroll</button>
       <p class="note" id="reg-msg" role="status" aria-live="polite"></p>
-      <p class="note">Your details are used only to reply about enrolment.</p>
+      <p class="note">Your details are used only to reply about enrollment.</p>
     </form>
   </section>
 
@@ -158,18 +168,22 @@ footer a { color: var(--gilt); }
 </footer>
 
 <script>
-// ---- Settings: where registrations go ----------------------------------
-// REGISTER_EMAIL: the visitor's own email app opens with the registration ready to send to this address.
-// FORM_ENDPOINT: optional. Paste a form-service address here (for example a Formspree form URL)
-// and registrations are posted to it directly, with no email app needed.
-var REGISTER_EMAIL = 'paola.dimaio@ronin-institute.org';
-var FORM_ENDPOINT = '';
+// ---- Settings: the Google Form that receives registrations -------------
+var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfwb6hxoHb5W3U6pF6Jqo2N-Fi7-u44oqtBwqhV1pMbhgp3cQ/formResponse';
+// Each line must match an option in the form's course dropdown exactly.
+var COURSES = ['Evaluating AI Models 2027', 'Auditing AI Models 2027'];
+var ENTRY = { course: 'entry.244262952', as: 'entry.2046574242', name: 'entry.379483953',
+              email: 'entry.844955345', email2: 'entry.2118769817',
+              organisation: 'entry.21725551', remarks: 'entry.1980649471' };
 // -------------------------------------------------------------------------
+
+var courseSel = document.getElementById('f-course');
+COURSES.forEach(function (c) { var o = document.createElement('option'); o.textContent = c; courseSel.appendChild(o); });
 
 // A course button preselects that course in the form.
 document.querySelectorAll('a[data-course]').forEach(function (a) {
   a.addEventListener('click', function () {
-    document.getElementById('f-course').value = a.getAttribute('data-course');
+    courseSel.value = a.getAttribute('data-course');
     setTimeout(function () { document.getElementById('f-name').focus(); }, 0);
   });
 });
@@ -178,29 +192,29 @@ var form = document.getElementById('reg-form'), msg = document.getElementById('r
 form.addEventListener('submit', function (e) {
   e.preventDefault();
   var ok = true, first = null;
-  ['f-name', 'f-email', 'f-org'].forEach(function (id) {
+  ['f-name', 'f-email'].forEach(function (id) {
     var el = document.getElementById(id);
     var good = el.value.trim() !== '' && el.checkValidity();
     el.classList.toggle('bad', !good);
     if (!good) { ok = false; first = first || el; }
   });
-  if (!ok) { msg.textContent = 'Please fill in name, a valid email and organisation.'; first.focus(); return; }
-  var d = {
-    course: document.getElementById('f-course').value,
-    name: document.getElementById('f-name').value.trim(),
-    email: document.getElementById('f-email').value.trim(),
-    organisation: document.getElementById('f-org').value.trim()
-  };
-  if (FORM_ENDPOINT) {
-    msg.textContent = 'Sending your registration.';
-    fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(d) })
-      .then(function (r) { if (!r.ok) throw 0; msg.textContent = 'Registration received. A reply follows by email.'; form.reset(); })
-      .catch(function () { msg.textContent = 'The registration could not be sent. Please try again.'; });
-    return;
-  }
-  var body = 'Course: ' + d.course + '\nName: ' + d.name + '\nEmail: ' + d.email + '\nOrganisation: ' + d.organisation;
-  window.location.href = 'mailto:' + REGISTER_EMAIL + '?subject=' + encodeURIComponent('Enrolment: ' + d.course) + '&body=' + encodeURIComponent(body);
-  msg.textContent = 'Your email app should open with the registration ready. Press send to complete it.';
+  if (!ok) { msg.textContent = 'Please fill in your name and a valid email address.'; first.focus(); return; }
+  var email = document.getElementById('f-email').value.trim();
+  var as = form.querySelector('input[name="as"]:checked');
+  var org = document.getElementById('f-org').value.trim(), rem = document.getElementById('f-rem').value.trim();
+  var data = new URLSearchParams();
+  data.append(ENTRY.course, courseSel.value);
+  if (as) data.append(ENTRY.as, as.value);
+  data.append(ENTRY.name, document.getElementById('f-name').value.trim());
+  data.append(ENTRY.email, email);
+  data.append(ENTRY.email2, email);
+  if (org) data.append(ENTRY.organisation, org);
+  if (rem) data.append(ENTRY.remarks, rem);
+  msg.textContent = 'Sending your registration.';
+  // Google does not let another site read its reply, so the page can confirm sending, not receipt.
+  fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: data })
+    .then(function () { msg.textContent = 'Registration sent. The prospectus and an invitation to enroll follow by email.'; form.reset(); })
+    .catch(function () { msg.textContent = 'The registration could not be sent. Please check your connection and try again.'; });
 });
 
 // A related-materials link whose file is not in the repository shows as plain text.

@@ -41,6 +41,18 @@ h2 { font: 500 34px/1.1 var(--text); margin: 0 0 12px; }
 .go { display: inline-block; font: 600 15px/1 var(--ui); padding: 13px 18px; background: var(--violet); color: #fff; text-decoration: none; border-bottom: 3px solid var(--gilt); }
 .go:hover { background: var(--loom); color: #fff; }
 .soon { display: inline-block; font: 600 13px/1 var(--ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 0; border-top: 3px solid var(--rule); }
+.register { display: grid; grid-template-columns: 1fr 1.25fr; gap: 0 48px; padding: 34px 0 32px; border-bottom: 1px solid var(--rule); scroll-margin-top: 12px; }
+.register .kicker { color: var(--bronze); margin-bottom: 10px; }
+.reg-head p { max-width: 38ch; margin: 0; }
+form label { display: block; font: 600 13px/1 var(--ui); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 7px; }
+form label span { color: var(--violet); }
+form input, form select { width: 100%; font: 400 17px/1.3 var(--ui); padding: 11px 12px; margin: 0 0 18px; border: 1px solid var(--muted); border-radius: 0; background: var(--sheet); color: var(--ink); }
+form input:focus, form select:focus { outline: 3px solid var(--gilt); outline-offset: 1px; border-color: var(--violet); }
+form input.bad { border-color: #a3261f; border-width: 2px; }
+form button.go { border: 0; border-bottom: 3px solid var(--gilt); cursor: pointer; }
+.note { font: 400 14px/1.45 var(--ui); color: var(--muted); margin: 12px 0 0; }
+#reg-msg:empty { display: none; }
+#reg-msg { color: var(--ink); font-weight: 600; }
 .lower { display: grid; grid-template-columns: 1fr 1.6fr; gap: 0 48px; padding-top: 30px; }
 h3 { font: 700 13px/1 var(--ui); letter-spacing: .14em; text-transform: uppercase; margin: 0 0 14px; color: var(--violet); }
 .lower ul { margin: 0 0 26px; padding: 0; list-style: none; }
@@ -51,7 +63,8 @@ footer { background: var(--loom); color: #cfc8da; font: 400 14px/1.5 var(--ui); 
 footer div { max-width: 1080px; margin: 0 auto; padding: 22px 28px; display: flex; flex-wrap: wrap; gap: 6px 28px; justify-content: space-between; }
 footer a { color: var(--gilt); }
 @media (max-width: 780px) {
-  .courses, .lower { grid-template-columns: 1fr; }
+  .courses, .lower, .register { grid-template-columns: 1fr; }
+  .reg-head { margin-bottom: 22px; }
   .course + .course { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; }
   .course:first-child h2 { font-size: 34px; }
 }
@@ -79,7 +92,7 @@ footer a { color: var(--gilt); }
         <li><b>Labs</b><span>Judge agreement, confidence interval against a threshold, vendor report triage, sign-off memo</span></li>
         <li><b>Coding</b><span>None</span></li>
       </ul>
-      <a class="go" data-check href="evaluation.html">Open the evaluation course</a>
+      <a class="go" href="#register" data-course="Evaluating AI models">Register to Enrol</a>
     </article>
 
     <article class="course">
@@ -91,8 +104,33 @@ footer a { color: var(--gilt); }
         <li><b>Units</b><span>Evaluation, audit and verification; assurance levels; access; independence; evidence and sampling; audit report; regimes compared; commissioning an auditor</span></li>
         <li><b>Coding</b><span>None</span></li>
       </ul>
-      <a class="go" data-check href="audit.html">Open the audit course</a>
+      <a class="go" href="#register" data-course="Auditing AI models">Register to Enrol</a>
     </article>
+  </section>
+
+  <section class="register" id="register" aria-labelledby="reg-h">
+    <div class="reg-head">
+      <p class="kicker">Enrolment</p>
+      <h2 id="reg-h">Register to Enrol</h2>
+      <p>Send your details and the course you want. A reply with enrolment information follows by email.</p>
+    </div>
+    <form id="reg-form" novalidate>
+      <label for="f-course">Course</label>
+      <select id="f-course" name="course">
+        <option>Evaluating AI models</option>
+        <option>Auditing AI models</option>
+        <option>Both courses</option>
+      </select>
+      <label for="f-name">Name <span aria-hidden="true">*</span></label>
+      <input id="f-name" name="name" type="text" autocomplete="name" required>
+      <label for="f-email">Email <span aria-hidden="true">*</span></label>
+      <input id="f-email" name="email" type="email" autocomplete="email" required>
+      <label for="f-org">Organisation <span aria-hidden="true">*</span></label>
+      <input id="f-org" name="organisation" type="text" autocomplete="organization" required>
+      <button class="go" type="submit">Register to Enrol</button>
+      <p class="note" id="reg-msg" role="status" aria-live="polite"></p>
+      <p class="note">Your details are used only to reply about enrolment.</p>
+    </form>
   </section>
 
   <section class="lower">
@@ -111,7 +149,7 @@ footer a { color: var(--gilt); }
   </section>
 </main>
 
-<footer> 
+<footer>
   <div class="band" aria-hidden="true" style="max-width:none;padding:0;display:block"></div>
   <div>
     <span>&copy; Copyright 2026 Epistemic Systems Lab &middot; Editor: Paola Di Maio</span>
@@ -120,18 +158,58 @@ footer a { color: var(--gilt); }
 </footer>
 
 <script>
-// A link whose file has not been uploaded yet shows as "In preparation" instead of a dead link.
+// ---- Settings: where registrations go ----------------------------------
+// REGISTER_EMAIL: the visitor's own email app opens with the registration ready to send to this address.
+// FORM_ENDPOINT: optional. Paste a form-service address here (for example a Formspree form URL)
+// and registrations are posted to it directly, with no email app needed.
+var REGISTER_EMAIL = 'paola.dimaio@ronin-institute.org';
+var FORM_ENDPOINT = '';
+// -------------------------------------------------------------------------
+
+// A course button preselects that course in the form.
+document.querySelectorAll('a[data-course]').forEach(function (a) {
+  a.addEventListener('click', function () {
+    document.getElementById('f-course').value = a.getAttribute('data-course');
+    setTimeout(function () { document.getElementById('f-name').focus(); }, 0);
+  });
+});
+
+var form = document.getElementById('reg-form'), msg = document.getElementById('reg-msg');
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var ok = true, first = null;
+  ['f-name', 'f-email', 'f-org'].forEach(function (id) {
+    var el = document.getElementById(id);
+    var good = el.value.trim() !== '' && el.checkValidity();
+    el.classList.toggle('bad', !good);
+    if (!good) { ok = false; first = first || el; }
+  });
+  if (!ok) { msg.textContent = 'Please fill in name, a valid email and organisation.'; first.focus(); return; }
+  var d = {
+    course: document.getElementById('f-course').value,
+    name: document.getElementById('f-name').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    organisation: document.getElementById('f-org').value.trim()
+  };
+  if (FORM_ENDPOINT) {
+    msg.textContent = 'Sending your registration.';
+    fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(d) })
+      .then(function (r) { if (!r.ok) throw 0; msg.textContent = 'Registration received. A reply follows by email.'; form.reset(); })
+      .catch(function () { msg.textContent = 'The registration could not be sent. Please try again.'; });
+    return;
+  }
+  var body = 'Course: ' + d.course + '\nName: ' + d.name + '\nEmail: ' + d.email + '\nOrganisation: ' + d.organisation;
+  window.location.href = 'mailto:' + REGISTER_EMAIL + '?subject=' + encodeURIComponent('Enrolment: ' + d.course) + '&body=' + encodeURIComponent(body);
+  msg.textContent = 'Your email app should open with the registration ready. Press send to complete it.';
+});
+
+// A related-materials link whose file is not in the repository shows as plain text.
 document.querySelectorAll('a[data-check]').forEach(function (a) {
   fetch(a.getAttribute('href'), { method: 'HEAD' }).then(function (r) {
-    if (!r.ok) mark(a);
-  }).catch(function () { /* opened from disk: leave the link as it is */ });
+    if (!r.ok) { var s = document.createElement('strong'); s.style.fontWeight = '500'; s.textContent = a.textContent; a.replaceWith(s); }
+  }).catch(function () {});
 });
-function mark(a) {
-  var s = document.createElement('span');
-  s.className = a.classList.contains('go') ? 'soon' : '';
-  s.textContent = a.classList.contains('go') ? 'In preparation' : a.textContent + ' (in preparation)';
-  a.replaceWith(s);
-}
 </script>
+
 </body>
 </html>
